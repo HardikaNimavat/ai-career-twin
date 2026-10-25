@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  ai-career-twin:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ai-career-twin-app
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=sqlite:///./ai_career_twin.db
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      - app_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  app_data:

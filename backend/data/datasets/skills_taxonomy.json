@@ -1,0 +1,91 @@
+{
+  "skills": {
+    "React": "frontend", "Vue.js": "frontend", "Angular": "frontend", "JavaScript": "frontend", "TypeScript": "frontend",
+    "HTML/CSS": "frontend", "Tailwind CSS": "frontend", "Next.js": "frontend", "Redux": "frontend", "Webpack": "frontend",
+    "Node.js": "backend", "Express.js": "backend", "Django": "backend", "Flask": "backend", "Spring Boot": "backend",
+    "REST APIs": "backend", "GraphQL": "backend", "Java": "backend", "Python": "backend", "PHP": "backend", "Ruby on Rails": "backend",
+    "Machine Learning": "data", "Deep Learning": "data", "Pandas": "data", "NumPy": "data", "TensorFlow": "data", "PyTorch": "data",
+    "Data Visualization": "data", "SQL": "data", "R": "data", "Statistics": "data", "scikit-learn": "data",
+    "Docker": "devops", "Kubernetes": "devops", "AWS": "devops", "CI/CD": "devops", "Terraform": "devops", "Jenkins": "devops",
+    "Linux": "devops", "Git": "devops", "Azure": "devops",
+    "MongoDB": "database", "PostgreSQL": "database", "MySQL": "database", "Redis": "database", "Firebase": "database", "SQLite": "database",
+    "React Native": "mobile", "Flutter": "mobile", "Swift": "mobile", "Kotlin": "mobile", "Android SDK": "mobile", "iOS Development": "mobile",
+    "Communication": "general", "Problem Solving": "general", "Agile/Scrum": "general", "System Design": "general",
+    "Testing": "general", "Data Structures & Algorithms": "general"
+  },
+  "aliases": {
+    "React": ["react.js", "reactjs", "react"],
+    "Vue.js": ["vue.js", "vuejs", "vue"],
+    "Node.js": ["node.js", "nodejs", "node"],
+    "Next.js": ["next.js", "nextjs"],
+    "HTML/CSS": ["html", "css", "html5", "css3"],
+    "REST APIs": ["rest api", "restful", "rest apis", "restful api"],
+    "Express.js": ["express.js", "expressjs", "express"],
+    "Data Structures & Algorithms": ["dsa", "data structures", "algorithms"],
+    "Agile/Scrum": ["agile", "scrum"],
+    "iOS Development": ["ios development", "ios", "swiftui"],
+    "Android SDK": ["android sdk", "android"],
+    "CI/CD": ["ci/cd", "ci cd", "continuous integration"],
+    "scikit-learn": ["scikit-learn", "sklearn", "scikit learn"],
+    "System Design": ["system design", "distributed systems"],
+    "Ruby on Rails": ["ruby on rails", "rails"],
+    "TensorFlow": ["tensorflow", "tf"],
+    "PyTorch": ["pytorch", "torch"],
+    "Tailwind CSS": ["tailwind", "tailwindcss"],
+    "PostgreSQL": ["postgres", "postgresql"],
+    "MongoDB": ["mongo", "mongodb"]
+  },
+  "cluster_colors": {
+    "frontend": "#00E8A8",
+    "backend": "#5EA8FF",
+    "data": "#FFB648",
+    "devops": "#FF6B7A",
+    "database": "#C792EA",
+    "mobile": "#5EE6E6",
+    "general": "#8E9AAD"
+  },
+  "cluster_labels": {
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "data": "Data / ML",
+    "devops": "DevOps",
+    "database": "Database",
+    "mobile": "Mobile",
+    "general": "General"
+  },
+  "adjacent_clusters": {
+    "frontend": ["backend", "mobile"],
+    "backend": ["frontend", "database", "devops", "data"],
+    "data": ["backend", "database"],
+    "devops": ["backend", "database"],
+    "database": ["backend", "devops", "data"],
+    "mobile": ["frontend", "backend"],
+    "general": ["general"]
+  },
+  "role_requirements": {
+    "frontend": {
+      "label": "Frontend Developer",
+      "requirements": [["React", 3], ["JavaScript", 3], ["TypeScript", 2], ["HTML/CSS", 3], ["Tailwind CSS", 2], ["Next.js", 2], ["Redux", 1], ["Testing", 1], ["Git", 1]]
+    },
+    "backend": {
+      "label": "Backend Developer",
+      "requirements": [["Node.js", 3], ["Express.js", 2], ["REST APIs", 3], ["SQL", 2], ["PostgreSQL", 2], ["Docker", 2], ["System Design", 2], ["Git", 1]]
+    },
+    "fullstack": {
+      "label": "Full Stack Developer",
+      "requirements": [["React", 2], ["Node.js", 2], ["JavaScript", 2], ["REST APIs", 2], ["MongoDB", 2], ["SQL", 1], ["Git", 1], ["System Design", 1], ["Docker", 1]]
+    },
+    "data": {
+      "label": "Data Scientist",
+      "requirements": [["Python", 3], ["Machine Learning", 3], ["Pandas", 3], ["NumPy", 2], ["Statistics", 3], ["SQL", 2], ["Data Visualization", 2], ["Deep Learning", 1]]
+    },
+    "devops": {
+      "label": "DevOps Engineer",
+      "requirements": [["Docker", 3], ["Kubernetes", 3], ["AWS", 3], ["CI/CD", 3], ["Terraform", 2], ["Linux", 2], ["Git", 1]]
+    },
+    "mobile": {
+      "label": "Mobile Developer",
+      "requirements": [["React Native", 2], ["Flutter", 2], ["Swift", 2], ["Kotlin", 2], ["Android SDK", 3], ["Git", 1]]
+    }
+  }
+}

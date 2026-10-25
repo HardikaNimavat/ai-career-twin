@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twin — AI Career Digital Twin</title>
+  <meta name="description" content="AI-powered career platform that builds your digital twin, analyzes skill gaps, predicts career trajectory, and provides personalized learning roadmaps with free courses.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css?v=4.1">
+</head>
+<body>
+
+  <!-- ============ TOPBAR ============ -->
+  <header id="topbar">
+    <div class="logo">
+      <div class="mark">T</div>
+      <div class="name">Twin</div>
+      <span class="subname">AI Career Platform</span>
+    </div>
+    
+    <nav id="topnav">
+      <button data-panel="profile" class="active">Digital Twin &amp; Skill Gaps</button>
+      <button data-panel="roadmap">🗺️ Chained Roadmap</button>
+      <button data-panel="market">Market &amp; Salary</button>
+      <button data-panel="exam">🎓 Exam Center</button>
+      <button data-panel="cert">💼 Jobs &amp; ATS</button>
+    </nav>
+    
+    <div class="topbar-actions">
+      <!-- Live Role Switcher in Topbar -->
+      <div class="top-role-switch-wrap" id="topRoleSwitchWrap" style="display:none;">
+        <span class="role-switch-icon">🎯</span>
+        <label for="topRoleSelector">Target Post:</label>
+        <select id="topRoleSelector" class="role-select-inline">
+          <option value="frontend">Frontend Developer</option>
+          <option value="backend">Backend Developer</option>
+          <option value="fullstack">Full Stack Developer</option>
+          <option value="data">Data Scientist</option>
+          <option value="devops">DevOps Engineer</option>
+          <option value="mobile">Mobile Developer</option>
+        </select>
+      </div>
+
+      <span class="badge" id="apiStatusBadge">FASTAPI &bull; ML LIVE</span>
+      <button class="btn-logout" id="logoutBtn" title="Reset Session and Log Out">
+        <span>⏻</span>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ OFFLINE / FALLBACK WARNING BANNER ============ -->
+  <div id="offlineBanner" class="offline-banner" style="display:none;">
+    <div class="offline-banner-content">
+      <span class="offline-icon">⚠️</span>
+      <span id="offlineBannerMsg">Backend server (FastAPI) is offline. Displaying local offline preview. Start the backend with 'python run.py' for live ML predictions.</span>
+    </div>
+    <button class="offline-close-btn" onclick="document.getElementById('offlineBanner').style.display='none'">✕</button>
+  </div>
+
+  <main>
+    <!-- ============ LANDING / ONBOARDING ============ -->
+    <section id="landing">
+      <div class="hero-intake-wrapper" id="heroIntakeSection">
+        <!-- Top Hero Header -->
+        <div class="hero-header-center">
+          <div class="hero-eyebrow-pill">
+            <span class="pulsing-dot"></span>
+            <span>AI Career Digital Twin • Computational Modeling</span>
+          </div>
+          <h1 class="hero-title">Architect Your Professional <span>Digital Twin</span></h1>
+          <p class="hero-subtitle">
+            Twin builds a dynamic computational model of your capabilities. It diagnoses live skill gaps for your chosen dream role, generates a game-chained learning journey with curated 100% free YouTube bootcamps, and synchronizes your progress across live exams and ATS job recommendations.
+          </p>
+          <div class="hero-feature-tags">
+            <span class="feature-tag"><span>⚡</span> Dual Ingestion (Direct Text &amp; OCR)</span>
+            <span class="feature-tag"><span>🎯</span> Dynamic Skill Gap Matrix</span>
+            <span class="feature-tag"><span>🗺️</span> 4-Stage Chained Free Roadmap</span>
+            <span class="feature-tag"><span>💼</span> Track-Prioritized ATS Matches</span>
+          </div>
+        </div>
+
+        <!-- Section Guide & Mode Switcher -->
+        <div class="intake-section-guide">
+          <div class="guide-title-wrap">
+            <div class="guide-step-row">
+              <span class="guide-step-tag">STEP 1</span>
+              <h3>Choose Ingestion Pipeline</h3>
+            </div>
+            <p>Select either Direct Text input or Document OCR Upload. Both feed directly into your personalized Twin.</p>
+          </div>
+          <div class="intake-mode-switcher-pills" id="inputModeTabs">
+            <button class="intake-pill-btn active input-tab" data-mode="text" id="pillSelectText" type="button">
+              <span class="pill-icon">📝</span>
+              <span class="pill-text">Pipeline A: Direct Text</span>
+            </button>
+            <button class="intake-pill-btn input-tab" data-mode="upload" id="pillSelectUpload" type="button">
+              <span class="pill-icon">📄</span>
+              <span class="pill-text">Pipeline B: Document OCR</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Spacious Dual Ingestion Cards -->
+        <div class="intake-cards-grid">
+          <!-- CARD A: Direct Text & Markdown Synthesis -->
+          <div class="intake-card active" id="intakeTextCard">
+            <div class="intake-card-header">
+              <div class="card-identity">
+                <div class="card-icon-badge text-badge">📝</div>
+                <div>
+                  <div class="pipeline-tag text-pipeline">Pipeline A</div>
+                  <h4>Direct Text &amp; Bio Synthesis</h4>
+                </div>
+              </div>
+              <div class="mode-status-indicator active" id="textModeIndicator">
+                <span class="status-dot"></span> Active Selection
+              </div>
+            </div>
+
+            <p class="intake-card-desc">
+              Paste or type your resume content, technical profile summary, or portfolio description. Ideal for fast editing, customized bullets, and quick experiments.
+            </p>
+
+            <div class="intake-card-body">
+              <div class="card-toolbar">
+                <button class="sample-load-pill" id="sampleBtn" type="button">
+                  <span class="lightning">⚡</span> Load Sample Resume (Hardika Nimavat)
+                </button>
+                <div class="char-count" id="textCharCount">0 characters</div>
+              </div>
+
+              <div class="textarea-wrap">
+                <textarea id="resumeInput" placeholder="Paste your resume, skills list, projects, and work experience here...
+
+e.g. Hardika Nimavat: B.Tech Computer Engineering student with foundational knowledge of HTML/CSS and introductory JavaScript. Built personal static projects and a portfolio website using CSS Flexbox/Grid and DOM scripting..."></textarea>
+              </div>
+
+              <div class="format-chips-row">
+                <span class="format-chip">Plain Text</span>
+                <span class="format-chip">Markdown</span>
+                <span class="format-chip">Copied PDF</span>
+                <span class="format-chip">Auto 50-Skill Taxonomy</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD B: Document & Multi-Certificate OCR Engine -->
+          <div class="intake-card" id="intakeUploadCard">
+            <div class="intake-card-header">
+              <div class="card-identity">
+                <div class="card-icon-badge upload-badge">📄</div>
+                <div>
+                  <div class="pipeline-tag upload-pipeline">Pipeline B &bull; Multi-Doc</div>
+                  <h4>Resume &amp; Certificates Ingestion</h4>
+                </div>
+              </div>
+              <div class="mode-status-indicator" id="uploadModeIndicator">
+                <span class="status-dot"></span> Click to Select
+              </div>
+            </div>
+
+            <p class="intake-card-desc">
+              Upload your <b>Resume / CV</b> along with <b>Multiple Certificates &amp; Credentials</b> (PDF or Image). Our dual PyPDF &amp; Neural Tesseract OCR extracts and synthesizes your unified Digital Twin.
+            </p>
+
+            <div class="intake-card-body">
+              <label class="intake-dropzone-large" id="resumeDropZone" for="resumeFileInput">
+                <div class="dropzone-inner">
+                  <div class="drop-icon-animated">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </div>
+                  <div class="drop-title">Upload Resume &amp; Multiple Certificates</div>
+                  <div class="drop-subtitle">Drag &amp; drop all files here or <span class="browse-link">browse computer</span></div>
+                  <div class="supported-formats-pills">
+                    <span class="doc-pill">📄 Resume (.PDF/.PNG/.JPG)</span>
+                    <span class="doc-pill">📜 Multiple Certificates</span>
+                    <span class="size-pill">Multi-Upload Ready</span>
+                  </div>
+                </div>
+                <input type="file" id="resumeFileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.webp" style="display:none;">
+              </label>
+
+              <!-- Uploaded Multi-File Document List -->
+              <div id="uploadedFileInfo" class="uploaded-files-manager" style="display:none;">
+                <div class="files-manager-header">
+                  <span class="manager-title">📁 Uploaded Documents (<span id="uploadedFilesCount">0</span>)</span>
+                  <div style="display:flex; gap:8px;">
+                    <label for="resumeFileInput" class="btn-add-more-files" title="Add more certificate or resume files">
+                      + Add More Files
+                    </label>
+                    <button id="clearUploadBtn" class="clear-upload-action" type="button" title="Remove all files">
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+                <div id="uploadedFilesList" class="uploaded-files-list"></div>
+                <div class="file-card-status" style="margin-top:8px;">
+                  <span class="status-success-dot"></span> Ready for Neural OCR &amp; Composite Twin Generation
+                </div>
+              </div>
+
+              <div class="format-chips-row">
+                <span class="format-chip">📄 Primary Resume</span>
+                <span class="format-chip">📜 Multiple Certificates</span>
+                <span class="format-chip">Tesseract Neural OCR</span>
+                <span class="format-chip">Composite Twin Boost</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unified Calibration & Generation Bar -->
+        <div class="calibration-deck">
+          <div class="deck-header">
+            <div class="deck-title-wrap">
+              <span class="guide-step-tag">STEP 2</span>
+              <h3>Calibrate &amp; Materialize Digital Twin</h3>
+            </div>
+            <div class="deck-notice">
+              <span>🔒 In-memory processing • Never shared</span>
+            </div>
+          </div>
+
+          <div class="calibration-controls-grid">
+            <div class="calib-field">
+              <label for="githubInput">
+                <span class="field-icon">🐙</span>
+                GitHub Developer Username
+              </label>
+              <div class="input-with-affix">
+                <span class="affix">github.com/</span>
+                <input id="githubInput" type="text" placeholder="e.g. hardika-nimavat-dev" value="hardika-nimavat-dev">
+              </div>
+              <div class="calib-hint">Fetches public repositories, commit cadence, and maturity.</div>
+            </div>
+
+            <div class="calib-field">
+              <label for="roleInput">
+                <span class="field-icon">🎯</span>
+                Target Dream Role
+              </label>
+              <div class="select-wrap">
+                <select id="roleInput">
+                  <option value="frontend" selected>Frontend Developer</option>
+                  <option value="backend">Backend Developer</option>
+                  <option value="fullstack">Full Stack Developer</option>
+                  <option value="data">Data Scientist</option>
+                  <option value="devops">DevOps Engineer</option>
+                  <option value="mobile">Mobile Developer</option>
+                </select>
+              </div>
+              <div class="calib-hint">Calculates custom skill gaps &amp; 4-stage chained roadmap.</div>
+            </div>
+
+            <div class="calib-action">
+              <button class="btn btn-generate-hero" id="generateBtn" type="button">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">Generate My Digital Twin</span>
+                <span class="btn-arrow">&rarr;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Sequence -->
+      <div id="loading">
+        <div class="spinner"></div>
+        <h3 style="margin-bottom:16px;">Building your Career Twin...</h3>
+        <div class="step" data-step="0">Parsing resume (text/PDF/image OCR) against 50-skill taxonomy &amp; AI extraction...</div>
+        <div class="step" data-step="1">Analyzing GitHub public repositories &amp; technical activity...</div>
+        <div class="step" data-step="2">Computing semantic cluster affinity and weighted gaps...</div>
+        <div class="step" data-step="3">Generating game-like chained learning roadmap with free YouTube &amp; platform courses...</div>
+        <div class="step" data-step="4">Evaluating ATS-Friendly CV score &amp; matching job recommendations...</div>
+        <div class="step" data-step="5">Generating AI-personalized roadmap with FREE courses &amp; dynamic exams...</div>
+      </div>
+    </section>
+
+    <!-- ============ APP PANELS ============ -->
+    <section id="app">
+
+      <!-- 1. PROFILE & SKILL GAPS (DIGITAL TWIN) PANEL -->
+      <div class="panel" id="panel-profile">
+        <div class="panel-head">
+          <div>
+            <h2>Your Digital Twin &amp; Skill Gap Engine</h2>
+            <p>Interactive computational model mapping your candidate foundation, active target ecosystem, and real-time semantic skill gap bridges.</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div class="profile-role-switcher">
+              <label for="profileRoleSwitchSelect" style="font-size:11.5px; color:var(--text-dim); text-transform:uppercase; font-weight:600; margin-right:6px;">Switch Post:</label>
+              <select id="profileRoleSwitchSelect" class="role-select-inline" style="background:var(--surface-2);">
+                <option value="frontend">Frontend Developer</option>
+                <option value="backend">Backend Developer</option>
+                <option value="fullstack">Full Stack Developer</option>
+                <option value="data">Data Scientist</option>
+                <option value="devops">DevOps Engineer</option>
+                <option value="mobile">Mobile Developer</option>
+              </select>
+            </div>
+            <span class="sim-tag live">Live Intelligence Engine</span>
+          </div>
+        </div>
+
+        <!-- Chatbot-Style Conversational Greeting upside Digital Twin -->
+        <div class="twin-greeting-banner" id="twinGreetingBanner">
+          <div class="twin-greeting-avatar">
+            <span class="avatar-emoji">🤖</span>
+            <span class="bot-online-indicator"></span>
+          </div>
+          <div class="twin-greeting-body">
+            <div class="twin-greeting-bubble">
+              <span class="greeting-hey" id="greetingUserText">Hey Hardika! 👋</span>
+              <span class="greeting-text">
+                Here is your real-time <b>AI Career Digital Twin</b>. We mapped your credentials, verified skills, and GitHub profile into an active computational model. Explore your interactive constellation graph and live skill gap bridges below.
+              </span>
+            </div>
+            <div class="twin-greeting-meta">
+              <span class="tg-pill">🎯 Target Post: <b id="greetingTargetRole">Frontend Developer</b></span>
+              <span class="tg-pill">⚡ Readiness: <b id="greetingReadiness" style="color:var(--accent);">35%</b></span>
+              <span class="tg-pill">⭐ Model: <b style="color:var(--accent);">Live &amp; Synced</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-grid">
+          <!-- Left: Dynamic Constellation Graph -->
+          <div id="constellation-wrap">
+            <div class="constellation-header">
+              <div class="constellation-title-badge" id="constellationTitleBadge">✦ TARGET ROLE ECOSYSTEM ✦</div>
+              <div class="constellation-legend-strip" id="constellationLegend"></div>
+            </div>
+            <svg id="constellationSvg" viewBox="0 0 760 500" width="100%" height="500"></svg>
+            <div class="constellation-footer" id="constellationSummaryBar"></div>
+          </div>
+
+          <!-- Right: Integrated Live Skill Gap Analysis -->
+          <div class="card integrated-gap-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+              <div>
+                <h3 style="font-size:16px;">Semantic Skill Gap Analysis</h3>
+                <p style="font-size:12px; color:var(--text-dim);">Live skill bridges, exact hits &amp; transfer credits</p>
+              </div>
+              <span class="sim-tag live" style="font-size:9.5px;">Synchronized Twin</span>
+            </div>
+
+            <!-- Readiness Ring Hero -->
+            <div class="readiness-hero-compact">
+              <div class="ring-wrap-compact">
+                <svg width="84" height="84">
+                  <circle cx="42" cy="42" r="36" stroke="#1A2230" stroke-width="8" fill="none"/>
+                  <circle id="readinessRing" cx="42" cy="42" r="36" stroke="#00E8A8" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226"/>
+                </svg>
+                <div class="val" id="readinessVal">0%</div>
+              </div>
+              <div class="readiness-compact-text">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint);">Post Alignment Readiness</div>
+                <h4 style="font-size:15px; color:var(--text); margin:2px 0;"><span id="readinessRole">&mdash;</span></h4>
+                <div id="targetRoleSkillsMet" style="font-size:12px; color:var(--accent); font-weight:600;">&mdash;</div>
+                <div style="font-size:11.5px; color:var(--text-dim); margin-top:2px;">
+                  Detected Skills: <b id="skillCount" style="color:var(--text);">&mdash;</b> &middot; Exp: <b id="expYears" style="color:var(--text);">&mdash;</b>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Skill Gap List -->
+            <div style="margin-top:14px; font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:6px;">
+              Required Skills Matrix:
+            </div>
+            <div class="gap-list compact-gap-list" id="gapList"></div>
+
+            <!-- Skill Progression Mini Card from Exams -->
+            <div class="mini-card" id="skillProgressionCard" style="display:none; margin-top:14px; background:var(--surface-2); border:1px solid var(--border);">
+              <h4 style="font-size:12.5px;">📈 Exam Center Progression <span class="sim-tag live" style="font-size:9px;">Dynamic Twin</span></h4>
+              <div class="kv"><span>Assessments Completed</span><span id="totalExamsTaken" class="highlight-val">0</span></div>
+              <div class="kv"><span>Total Skill Boost</span><span id="totalImprovement" class="score-highlight" style="color:var(--accent);">+0%</span></div>
+              <div id="progressionSummary" style="margin-top:6px; font-size:11.5px; color:var(--text-dim);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. GAME-LIKE CHAINED ROADMAP PANEL -->
+      <div class="panel" id="panel-roadmap">
+        <div class="panel-head">
+          <div>
+            <h2>🎮 Chained Career Roadmap</h2>
+            <p>Game-like level progression linking foundational skills to production mastery. 100% <strong>FREE</strong> YouTube bootcamps &amp; verified open curriculum.</p>
+          </div>
+          <span class="sim-tag live">Game-Chained Stages &middot; Dynamic Completion</span>
+        </div>
+
+        <!-- Overall Game Progression Card -->
+        <div class="card game-roadmap-overview">
+          <div class="roadmap-overview-grid">
+            <div class="overview-metric">
+              <span class="overview-lbl">Current Target Road</span>
+              <span class="overview-val mono" id="roadmapRoleLabel" style="color:var(--accent);">FRONTEND DEVELOPER</span>
+            </div>
+            <div class="overview-metric">
+              <span class="overview-lbl">Courses Completed</span>
+              <span class="overview-val" id="roadmapOverallStats">0 of 0 Completed</span>
+            </div>
+            <div class="overview-metric">
+              <span class="overview-lbl">Current Game Status</span>
+              <span class="overview-val" id="roadmapStatusPill" style="color:var(--amber);">Stage 1 Active</span>
+            </div>
+          </div>
+          <div class="game-progress-bar-wrap" style="margin-top:14px;">
+            <div class="game-progress-track">
+              <div class="game-progress-fill" id="roadmapOverallProgressFill" style="width:0%;"></div>
+            </div>
+            <div class="game-progress-sub" id="roadmapOverallProgressText">0% Complete &middot; 100% Left</div>
+          </div>
+        </div>
+
+        <div class="roadmap-free-banner" style="margin-top:16px;">
+          🎁 <b>Strictly 100% Free Resources Guarantee:</b> Every single course and bootcamp below is accessible for free on YouTube, freeCodeCamp, Harvard CS50, React.dev, and open documentation with no paywalls or trial expirations.
+        </div>
+
+        <!-- Chained Stages Container (Stages 1 -> 2 -> 3 -> 4) -->
+        <div class="game-chain-container" id="roadmapTrack"></div>
+
+        <div class="card" id="roadmapEmpty" style="display:none; text-align:center; color:var(--text-dim); padding:40px;">
+          Strong match already &mdash; no critical gaps detected for this role.
+        </div>
+      </div>
+
+      <!-- 5. MARKET & SALARY PANEL -->
+      <div class="panel" id="panel-market">
+        <div class="panel-head">
+          <div>
+            <h2>Market &amp; Salary Intelligence</h2>
+            <p>Compensation estimated using our Gradient Boosting regression model trained on real Indian tech job postings.</p>
+          </div>
+          <span class="sim-tag live">Trained Regression ML</span>
+        </div>
+
+        <!-- City Selector Pills -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim); margin-bottom:8px;">
+            Select Regional Tech Hub
+          </div>
+          <div class="city-pill-selector" id="cityPillsContainer">
+            <button class="city-pill active" data-city="Ahmedabad">Ahmedabad (0.88x)</button>
+            <button class="city-pill" data-city="Bangalore">Bangalore (1.25x)</button>
+            <button class="city-pill" data-city="Mumbai">Mumbai (1.18x)</button>
+            <button class="city-pill" data-city="Delhi-NCR">Delhi-NCR (1.15x)</button>
+            <button class="city-pill" data-city="Hyderabad">Hyderabad (1.10x)</button>
+            <button class="city-pill" data-city="Pune">Pune (1.05x)</button>
+            <button class="city-pill" data-city="Remote">Remote Global (1.20x)</button>
+          </div>
+        </div>
+
+        <!-- 3-Column Metrics Grid -->
+        <div class="market-grid">
+          <div class="mstat">
+            <div class="label">Estimated Compensation Band</div>
+            <div class="value accent-val" id="salaryRange">&mdash;</div>
+            <div class="sub">Annual INR &middot; <span id="salaryLocationLabel" style="color:var(--text); font-weight:600;">Ahmedabad</span> (₹ LPA)</div>
+          </div>
+          <div class="mstat gold">
+            <div class="label">Time to Full Job-Readiness</div>
+            <div class="value" id="timeToReady" style="color:var(--amber);">&mdash;</div>
+            <div class="sub" id="timeToReadySub">based on open critical gaps</div>
+          </div>
+          <div class="mstat blue">
+            <div class="label">Role Industry Demand Trend</div>
+            <div class="value" id="demandTrend" style="color:var(--blue);">&mdash;</div>
+            <div class="sub">YoY Industry Growth &middot; High Hiring Index</div>
+          </div>
+        </div>
+
+        <!-- Experience Level Progression Ladder -->
+        <div class="bench-card" style="margin-bottom:20px;">
+          <h4 style="font-size:13.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+            <span>Career Progression Compensation Ladder</span>
+            <span style="font-size:11.5px; color:var(--accent); font-weight:600;">Regional Adjusted Benchmarks</span>
+          </h4>
+          <div id="benchRows"></div>
+        </div>
+
+        <!-- High Value Skill Multipliers -->
+        <div class="card">
+          <h4 style="font-size:13.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:6px;">
+            High-Value Skill Multipliers for <span id="salaryRoleTitle" style="color:var(--accent);">Frontend</span>
+          </h4>
+          <p style="font-size:12.5px; color:var(--text-faint); margin-bottom:14px;">Acquiring these high-demand technologies unlocks the highest compensation increase in the current market.</p>
+          <div class="skill-multipliers-grid" id="skillMultipliersGrid">
+            <div class="skill-mult-card">
+              <span class="skill-mult-name">Next.js &amp; App Router</span>
+              <span class="skill-mult-bump">+18% LPA</span>
+            </div>
+            <div class="skill-mult-card">
+              <span class="skill-mult-name">TypeScript Mastery</span>
+              <span class="skill-mult-bump">+15% LPA</span>
+            </div>
+            <div class="skill-mult-card">
+              <span class="skill-mult-name">Docker &amp; CI/CD Basics</span>
+              <span class="skill-mult-bump">+14% LPA</span>
+            </div>
+            <div class="skill-mult-card">
+              <span class="skill-mult-name">System Design &amp; Architecture</span>
+              <span class="skill-mult-bump">+22% LPA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Market & Salary ML Regressor Telemetry -->
+        <div id="salaryMlTelemetry"></div>
+
+        <!-- Career Trajectory Prediction -->
+        <div class="card" id="trajectorySection" style="margin-top:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div>
+              <h4 style="font-size:13.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:4px;">
+                📈 Career Trajectory Prediction
+              </h4>
+              <p style="font-size:12px; color:var(--text-faint);">ML-projected role readiness over time based on your current skills, experience &amp; learning pace.</p>
+            </div>
+            <span class="sim-tag live">Trajectory ML</span>
+          </div>
+
+          <!-- Trajectory Timeline Bars -->
+          <div id="trajectoryTimeline" style="display:flex; flex-direction:column; gap:14px;">
+            <!-- 3 Month -->
+            <div class="trajectory-row">
+              <div class="trajectory-label">
+                <span class="trajectory-period">3 Months</span>
+                <span class="trajectory-prob" id="trajProb3m">—</span>
+              </div>
+              <div class="gap-track" style="flex:1;">
+                <div class="gap-fill" id="trajBar3m" style="width:0%; background:var(--coral); transition: width 0.8s ease;"></div>
+              </div>
+              <span class="trajectory-readiness" id="trajReadiness3m">—</span>
+            </div>
+            <!-- 6 Month -->
+            <div class="trajectory-row">
+              <div class="trajectory-label">
+                <span class="trajectory-period">6 Months</span>
+                <span class="trajectory-prob" id="trajProb6m">—</span>
+              </div>
+              <div class="gap-track" style="flex:1;">
+                <div class="gap-fill" id="trajBar6m" style="width:0%; background:var(--amber); transition: width 0.8s ease;"></div>
+              </div>
+              <span class="trajectory-readiness" id="trajReadiness6m">—</span>
+            </div>
+            <!-- 12 Month -->
+            <div class="trajectory-row">
+              <div class="trajectory-label">
+                <span class="trajectory-period">12 Months</span>
+                <span class="trajectory-prob" id="trajProb12m">—</span>
+              </div>
+              <div class="gap-track" style="flex:1;">
+                <div class="gap-fill" id="trajBar12m" style="width:0%; background:var(--accent); transition: width 0.8s ease;"></div>
+              </div>
+              <span class="trajectory-readiness" id="trajReadiness12m">—</span>
+            </div>
+          </div>
+
+          <!-- Trajectory Summary -->
+          <div id="trajectorySummary" style="margin-top:16px; padding:12px 16px; background:rgba(0,232,168,0.06); border:1px solid rgba(0,232,168,0.15); border-radius:10px; font-size:13px; color:var(--text-dim); line-height:1.5;">
+            —
+          </div>
+
+          <!-- Study Hours Recalc Controls -->
+          <div class="trajectory-controls">
+            <span class="traj-slider-label">Study Commitment:</span>
+            <input type="range" id="studyHoursSlider" min="4" max="40" value="14" step="2">
+            <span class="traj-slider-value" id="studyHrsVal">14 hrs/wk</span>
+            <button class="btn-recalc-traj" id="recalcTrajBtn">📈 Recalculate Trajectory</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. MULTI-FORMAT EXAM CENTER (was "Technical MCQs") -->
+      <div class="panel" id="panel-exam">
+        <div class="panel-head">
+          <div>
+            <h2>🎓 Multi-Format Exam Center</h2>
+            <p>Dynamic AI-powered assessments across MCQ, Code, Essay, Debug &amp; System Design. Your digital twin updates after every exam.</p>
+          </div>
+          <span class="sim-tag live">AI-Powered &middot; Twin Auto-Update</span>
+        </div>
+
+        <!-- Exam Configuration -->
+        <div class="card exam-config-card" id="examConfigCard">
+          <h4 style="font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:14px;">
+            🎮 Configure Your Assessment
+          </h4>
+          <div class="exam-config-grid">
+            <div class="field">
+              <label for="examTypeSelect">Exam Type</label>
+              <select id="examTypeSelect" class="role-select-inline" style="background:var(--surface-2);">
+                <option value="mcq">📝 MCQ (Multiple Choice)</option>
+                <option value="code">💻 Code Challenge</option>
+                <option value="essay">✍️ Essay / Explain</option>
+                <option value="debug">🐛 Debug Challenge</option>
+                <option value="design">🏗️ System Design</option>
+                <option value="mixed">🎲 Mixed (All Types)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="examDifficultySelect">Difficulty</label>
+              <select id="examDifficultySelect" class="role-select-inline" style="background:var(--surface-2);">
+                <option value="beginner">🟢 Beginner</option>
+                <option value="intermediate" selected>🟡 Intermediate</option>
+                <option value="advanced">🔴 Advanced</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="examCountSelect">Questions</label>
+              <select id="examCountSelect" class="role-select-inline" style="background:var(--surface-2);">
+                <option value="3">3 Questions</option>
+                <option value="5" selected>5 Questions</option>
+                <option value="8">8 Questions</option>
+                <option value="10">10 Questions</option>
+              </select>
+            </div>
+            <div class="field" style="display:flex; align-items:flex-end;">
+              <button class="btn" id="startExamBtn" style="width:100%;">
+                <span>🚀 Start Exam</span>
+              </button>
+            </div>
+          </div>
+          <div style="margin-top:12px; font-size:12px; color:var(--text-faint);">
+            ⚡ Questions are AI-generated based on your weak skills. Results automatically update your digital twin.
+          </div>
+        </div>
+
+        <!-- Exam Loading -->
+        <div id="examLoading" style="display:none; text-align:center; padding:40px;">
+          <div class="spinner"></div>
+          <p style="margin-top:16px; color:var(--text-dim);">AI is generating personalized <span id="examLoadingType">MCQ</span> questions...</p>
+        </div>
+
+        <!-- Active Exam Container -->
+        <div id="examActiveContainer" style="display:none;">
+          <div class="card">
+            <!-- Exam Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span class="mcq-topic-badge" id="examTopicBadge">Topic</span>
+                <span class="mcq-skill-badge" id="examSkillBadge">Skill</span>
+                <span class="badge" id="examTypeBadge" style="font-size:10px;">MCQ</span>
+              </div>
+              <div class="mcq-progress-indicator" id="examProgressIndicator">Question <b>1 of 5</b></div>
+            </div>
+
+            <div class="mcq-track-bar">
+              <div class="mcq-track-fill" id="examTrackFill" style="width: 20%;"></div>
+            </div>
+
+            <!-- Question Display -->
+            <div class="mcq-question" id="examQuestionText">Loading...</div>
+
+            <!-- MCQ Options (shown for MCQ type) -->
+            <div class="mcq-options-grid" id="examOptionsGrid" style="display:none;"></div>
+
+            <!-- Code Editor (shown for code/debug type) -->
+            <div id="examCodeEditor" style="display:none;">
+              <div style="font-size:12px; color:var(--text-dim); margin-bottom:8px;">
+                <span id="examCodeLanguage" class="mono" style="color:var(--accent);"></span>
+                <span id="examCodeHint" style="margin-left:12px;"></span>
+              </div>
+              <textarea id="examCodeInput" class="code-textarea" placeholder="Write your code here..." rows="12"></textarea>
+            </div>
+
+            <!-- Essay/Design textarea (shown for essay/design type) -->
+            <div id="examEssayEditor" style="display:none;">
+              <textarea id="examEssayInput" class="essay-textarea" placeholder="Write your detailed answer here..." rows="10"></textarea>
+              <div style="font-size:11px; color:var(--text-faint); margin-top:6px;">
+                Word count: <span id="examWordCount">0</span> / <span id="examMaxWords">400</span>
+              </div>
+            </div>
+
+            <!-- Debug Info (shown for debug type) -->
+            <div id="examDebugInfo" style="display:none;">
+              <div style="font-size:12px; font-weight:600; color:var(--coral); margin-bottom:8px;">🐛 Bug Description:</div>
+              <div id="examBugDescription" style="font-size:13px; color:var(--text-dim); margin-bottom:12px;"></div>
+              <div style="font-size:12px; font-weight:600; color:var(--text-dim); margin-bottom:8px;">Buggy Code:</div>
+              <pre id="examBuggyCode" class="code-block"></pre>
+            </div>
+
+            <!-- Explanation Box -->
+            <div class="mcq-explanation-box" id="examExplanationBox">
+              <h5><span>💡</span> Feedback &amp; Explanation</h5>
+              <p id="examExplanationText">&mdash;</p>
+            </div>
+
+            <!-- Feedback Card -->
+            <div id="examLiveFeedback" style="display:none; margin-bottom:18px;"></div>
+
+            <!-- Footer -->
+            <div class="mcq-footer-bar">
+              <button class="btn secondary" id="examBackToConfig" style="padding:9px 16px; font-size:12.5px;">← Back to Config</button>
+              <button class="btn" id="examSubmitBtn" style="padding:10px 24px; margin-left:auto;">Submit Answer →</button>
+              <button class="btn" id="examNextBtn" disabled style="padding:10px 24px; display:none;">Next Question →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exam Completion Report -->
+        <div class="card mcq-completion-card" id="examCompletionCard" style="display:none;">
+          <div style="text-align:center; padding:10px 0 24px; border-bottom:1px solid var(--border);">
+            <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-dim); margin-bottom:6px;">Multi-Format Assessment Result</div>
+            <div id="examFinalClearanceBadge" class="clearance-badge-hero">&mdash;</div>
+            <div style="font-family:'Space Grotesk'; font-size:48px; font-weight:700; color:var(--accent); margin:12px 0 4px;" id="examFinalScoreText">0%</div>
+            <div style="font-size:13px; color:var(--text-dim);" id="examFinalSummary">&mdash;</div>
+
+            <!-- Algorithmic Complexity Benchmark Summary -->
+            <div id="examComplexitySummary" class="exam-complexity-summary-card" style="display:none;"></div>
+          </div>
+
+          <!-- Skill Updates from Exam -->
+          <div id="examSkillUpdatesSection" style="margin-top:20px; display:none;">
+            <h4 style="font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:var(--accent); margin-bottom:14px;">
+              ✨ Digital Twin Updated — Skill Changes
+            </h4>
+            <div id="examSkillUpdatesList"></div>
+          </div>
+
+          <!-- Detailed Results -->
+          <div style="margin-top:24px;">
+            <h4 style="font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:14px;">
+              Detailed Results &amp; Diagnostics
+            </h4>
+            <div class="diagnostics-list" id="examDiagnosticsList"></div>
+          </div>
+
+          <!-- Recommendations -->
+          <div id="examRecommendations" style="margin-top:20px;"></div>
+
+          <!-- Action Buttons -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:28px; padding-top:20px; border-top:1px solid var(--border);">
+            <button class="btn secondary" id="examRestartBtn">
+              <span>🔄 Take Another Exam</span>
+            </button>
+            <button class="btn" id="examGoRoadmapBtn">
+              <span>🗺️ Study Weak Skills in Roadmap →</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Legacy MCQ container (hidden, kept for backward compatibility) -->
+        <div id="mcqActiveContainer" style="display:none;"></div>
+        <div id="mcqCompletionCard" style="display:none;"></div>
+
+      </div>
+
+      <!-- 7. CERTIFICATES, ATS COMPATIBILITY & JOB RECOMMENDATIONS PANEL -->
+      <div class="panel" id="panel-cert">
+        <div class="panel-head">
+          <div>
+            <h2>ATS Compatibility, Role Confidence &amp; Job Matches</h2>
+            <p>ATS-friendly CV scoring, role skill confidence analysis, and tailored industry job post recommendations based on your resume.</p>
+          </div>
+          <span class="sim-tag live">ATS &amp; Industry Role Matcher</span>
+        </div>
+
+        <!-- ATS & Skill Confidence Dual Metrics Grid -->
+        <div class="ats-grid">
+          
+          <!-- Card 1: ATS Friendly CV Score -->
+          <div class="ats-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <h4 style="font-size:13px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim);">ATS-Friendly CV Score</h4>
+              <span class="badge-ats" id="atsRatingBadge">ATS Optimized</span>
+            </div>
+            <div class="ats-gauge-wrap">
+              <div class="ats-circle-val" id="atsScoreVal">82</div>
+              <div style="font-size:13px; color:var(--text-dim);">/ 100 ATS Rating</div>
+            </div>
+
+            <!-- Verified Credentials Active Banner -->
+            <div id="atsCertificatesBadgeWrap" style="display:none; margin-bottom:14px; padding:7px 12px; background:rgba(0,232,168,0.12); border:1px solid var(--accent-dim); border-radius:8px; font-size:12px; color:var(--accent); display:flex; align-items:center; gap:8px;">
+              <span>⭐</span>
+              <span id="atsCertBadgeText" style="font-weight:600;">Verified Credentials Active (+10 ATS Boost)</span>
+            </div>
+
+            <div class="ats-sub-bars">
+              <div class="ats-sub-row">
+                <span>Formatting &amp; Structure</span>
+                <span id="atsFmtScore">85%</span>
+              </div>
+              <div class="bench-track"><div class="bench-fill" id="atsFmtFill" style="width:85%; background:var(--accent);"></div></div>
+              
+              <div class="ats-sub-row" style="margin-top:8px;">
+                <span>Skill Keyword Density</span>
+                <span id="atsKeywordScore">80%</span>
+              </div>
+              <div class="bench-track"><div class="bench-fill" id="atsKeywordFill" style="width:80%; background:var(--blue);"></div></div>
+
+              <div class="ats-sub-row" style="margin-top:8px;">
+                <span>Action Verbs &amp; Impact</span>
+                <span id="atsActionScore">75%</span>
+              </div>
+              <div class="bench-track"><div class="bench-fill" id="atsActionFill" style="width:75%; background:var(--amber);"></div></div>
+            </div>
+          </div>
+
+          <!-- Card 2: Role Skill Coverage & Confidence -->
+          <div class="ats-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <h4 style="font-size:13px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim);">Role Skill Coverage</h4>
+              <span class="mono" id="atsRoleCoverageBadge" style="font-size:12px; color:var(--accent); font-weight:600;">FRONTEND</span>
+            </div>
+            <div style="font-family:'Space Grotesk'; font-size:32px; font-weight:700; color:var(--accent); margin-bottom:6px;" id="atsCoveragePct">33.3% Match</div>
+            <p style="font-size:13px; color:var(--text-dim); line-height:1.5; margin-bottom:14px;" id="atsCoverageSummaryText">
+              You possess 3 out of 9 critical skills for Frontend Developer.
+            </p>
+            <div>
+              <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-faint); margin-bottom:8px;">Missing Critical Skills for this Post:</div>
+              <div class="missing-skills-wrap" id="atsMissingSkillsWrap"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Recommended Related Job Posts Based on CV & Digital Twin -->
+        <div class="card" style="margin-top:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+            <div>
+              <h4 style="font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-bottom:4px;">
+                💼 Intelligent Job &amp; Role Recommendations
+              </h4>
+              <p style="font-size:12.5px; color:var(--text-faint);">
+                Live algorithmic matching evaluating your detected skills, ATS profile, and career readiness against real industry job openings.
+              </p>
+            </div>
+            <!-- Quick Filter Pills -->
+            <div class="job-filter-pills" id="jobFilterPills">
+              <button class="job-filter-pill active" data-filter="all">All Openings</button>
+              <button class="job-filter-pill" data-filter="high">🎯 Qualified Match (&ge;70%)</button>
+              <button class="job-filter-pill" data-filter="growth">📈 Growth Roles</button>
+            </div>
+          </div>
+
+          <div class="job-posts-grid" id="jobPostsGrid"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Live Digital Twin Dynamic Update Toast -->
+    <div id="twinUpdateToast" class="twin-update-toast" style="display:none;">
+      <span style="font-size:22px;">✨</span>
+      <div>
+        <div style="font-weight:700; color:var(--accent);">Digital Twin Dynamically Updated!</div>
+        <div id="twinToastMsg" style="font-size:12px; color:var(--text-dim);">Skill confidence, gaps, trajectory &amp; compensation recalculated live.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Twin &mdash; AI Career Digital Twin &middot; Software Group Project (Indus University, Ahmedabad &middot; 2025&ndash;2026).
+  </footer>
+
+  <script src="/js/api.js?v=4.1"></script>
+  <script src="/js/constellation.js?v=4.1"></script>
+  <script src="/js/interview.js?v=4.1"></script>
+  <script src="/js/cert_verifier.js?v=4.1"></script>
+  <script src="/js/app.js?v=4.1"></script>
+</body>
+</html>
