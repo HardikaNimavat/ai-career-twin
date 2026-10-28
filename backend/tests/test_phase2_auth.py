@@ -165,3 +165,41 @@ def test_delete_profile_me_and_export():
     export_after = client.get("/api/v1/profile/me/export", headers=headers)
     assert export_after.status_code == 200
     assert len(export_after.json()["profiles"]) == 0
+
+def test_github_verification_and_session():
+    client = get_new_client()
+
+    # 1. Verify valid GitHub user
+    resp_valid = client.get("/api/v1/github/verify?username=HardikaNimavat")
+    assert resp_valid.status_code == 200
+    data = resp_valid.json()
+    assert data["valid"] is True
+    assert "username" in data
+
+    # 2. Verify invalid GitHub user fails with 404
+    resp_invalid = client.get("/api/v1/github/verify?username=invalid_user_never_exists_129471924")
+    assert resp_invalid.status_code == 404
+
+    # 3. Establish session directly with GitHub account (zero passwords, zero signup)
+    session_resp = client.post("/api/v1/auth/github-session", json={
+        "github_username": "HardikaNimavat"
+    })
+    assert session_resp.status_code == 200
+    s_data = session_resp.json()
+    assert "access_token" in s_data
+    token = s_data["access_token"]
+    assert s_data["user"]["username"] == "HardikaNimavat"
+
+    # 4. Generate digital twin using ONLY GitHub handle (resume text completely optional)
+    auth_headers = {"Authorization": f"Bearer {token}"}
+    twin_resp = client.post("/api/v1/profile/parse", json={
+        "github_username": "HardikaNimavat",
+        "target_role": "frontend",
+        "resume_text": ""
+    }, headers=auth_headers)
+    assert twin_resp.status_code == 200
+    twin = twin_resp.json()
+    assert twin["github"]["username"] in ["HardikaNimavat", "hardikanimavat"]
+    assert len(twin["roadmap"]) >= 1
+    assert twin["salary_estimate"]["median_lpa"] > 0
+

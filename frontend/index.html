@@ -44,10 +44,14 @@
       </div>
 
       <span class="badge" id="apiStatusBadge">FASTAPI &bull; ML LIVE</span>
-      <button class="btn-logout" id="logoutBtn" title="Reset Session and Log Out">
-        <span>⏻</span>
-        <span>Log Out</span>
-      </button>
+      <div class="user-twin-pill" id="userTwinPill" style="display:none;">
+        <img id="topbarAvatar" src="https://avatars.githubusercontent.com/u/159757169?v=4" alt="Avatar" class="user-avatar-mini">
+        <span id="topbarUsername" class="user-handle-mini">@HardikaNimavat</span>
+        <button class="btn-logout" id="logoutBtn" title="Switch GitHub Account">
+          <span>⏻</span>
+          <span>Switch Account</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -82,170 +86,35 @@
           </div>
         </div>
 
-        <!-- Section Guide & Mode Switcher -->
-        <div class="intake-section-guide">
-          <div class="guide-title-wrap">
-            <div class="guide-step-row">
-              <span class="guide-step-tag">STEP 1</span>
-              <h3>Choose Ingestion Pipeline</h3>
-            </div>
-            <p>Select either Direct Text input or Document OCR Upload. Both feed directly into your personalized Twin.</p>
-          </div>
-          <div class="intake-mode-switcher-pills" id="inputModeTabs">
-            <button class="intake-pill-btn active input-tab" data-mode="text" id="pillSelectText" type="button">
-              <span class="pill-icon">📝</span>
-              <span class="pill-text">Pipeline A: Direct Text</span>
-            </button>
-            <button class="intake-pill-btn input-tab" data-mode="upload" id="pillSelectUpload" type="button">
-              <span class="pill-icon">📄</span>
-              <span class="pill-text">Pipeline B: Document OCR</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Spacious Dual Ingestion Cards -->
-        <div class="intake-cards-grid">
-          <!-- CARD A: Direct Text & Markdown Synthesis -->
-          <div class="intake-card active" id="intakeTextCard">
-            <div class="intake-card-header">
-              <div class="card-identity">
-                <div class="card-icon-badge text-badge">📝</div>
-                <div>
-                  <div class="pipeline-tag text-pipeline">Pipeline A</div>
-                  <h4>Direct Text &amp; Bio Synthesis</h4>
-                </div>
-              </div>
-              <div class="mode-status-indicator active" id="textModeIndicator">
-                <span class="status-dot"></span> Active Selection
+        <!-- ============ PRIMARY GITHUB TWIN GATEWAY (NO LOGIN / SIGN UP) ============ -->
+        <div class="github-gateway-card">
+          <div class="gateway-header">
+            <div class="gateway-title-wrap">
+              <div class="gateway-octocat-icon">🐙</div>
+              <div class="gateway-title">
+                <h3>Enter Your GitHub Account</h3>
+                <p>No passwords or sign-up required. Enter your GitHub username to verify your account in real-time and materialize your AI Digital Twin.</p>
               </div>
             </div>
+            <div class="no-login-badge">
+              <span>⚡</span> Pure GitHub Identity &bull; Zero Sign-Up
+            </div>
+          </div>
 
-            <p class="intake-card-desc">
-              Paste or type your resume content, technical profile summary, or portfolio description. Ideal for fast editing, customized bullets, and quick experiments.
-            </p>
-
-            <div class="intake-card-body">
-              <div class="card-toolbar">
-                <button class="sample-load-pill" id="sampleBtn" type="button">
-                  <span class="lightning">⚡</span> Load Sample Resume (Hardika Nimavat)
+          <div class="gateway-form-grid">
+            <div class="gateway-field">
+              <label for="githubInput">GitHub Developer Account</label>
+              <div class="github-input-with-action">
+                <span class="github-prefix">github.com/</span>
+                <input id="githubInput" type="text" placeholder="e.g. HardikaNimavat" value="HardikaNimavat" autocomplete="off" spellcheck="false">
+                <button type="button" class="btn-check-github" id="btnCheckGithub" title="Verify GitHub account">
+                  <span>🔍 Verify</span>
                 </button>
-                <div class="char-count" id="textCharCount">0 characters</div>
-              </div>
-
-              <div class="textarea-wrap">
-                <textarea id="resumeInput" placeholder="Paste your resume, skills list, projects, and work experience here...
-
-e.g. Hardika Nimavat: B.Tech Computer Engineering student with foundational knowledge of HTML/CSS and introductory JavaScript. Built personal static projects and a portfolio website using CSS Flexbox/Grid and DOM scripting..."></textarea>
-              </div>
-
-              <div class="format-chips-row">
-                <span class="format-chip">Plain Text</span>
-                <span class="format-chip">Markdown</span>
-                <span class="format-chip">Copied PDF</span>
-                <span class="format-chip">Auto 50-Skill Taxonomy</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD B: Document & Multi-Certificate OCR Engine -->
-          <div class="intake-card" id="intakeUploadCard">
-            <div class="intake-card-header">
-              <div class="card-identity">
-                <div class="card-icon-badge upload-badge">📄</div>
-                <div>
-                  <div class="pipeline-tag upload-pipeline">Pipeline B &bull; Multi-Doc</div>
-                  <h4>Resume &amp; Certificates Ingestion</h4>
-                </div>
-              </div>
-              <div class="mode-status-indicator" id="uploadModeIndicator">
-                <span class="status-dot"></span> Click to Select
               </div>
             </div>
 
-            <p class="intake-card-desc">
-              Upload your <b>Resume / CV</b> along with <b>Multiple Certificates &amp; Credentials</b> (PDF or Image). Our dual PyPDF &amp; Neural Tesseract OCR extracts and synthesizes your unified Digital Twin.
-            </p>
-
-            <div class="intake-card-body">
-              <label class="intake-dropzone-large" id="resumeDropZone" for="resumeFileInput">
-                <div class="dropzone-inner">
-                  <div class="drop-icon-animated">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                  </div>
-                  <div class="drop-title">Upload Resume &amp; Multiple Certificates</div>
-                  <div class="drop-subtitle">Drag &amp; drop all files here or <span class="browse-link">browse computer</span></div>
-                  <div class="supported-formats-pills">
-                    <span class="doc-pill">📄 Resume (.PDF/.PNG/.JPG)</span>
-                    <span class="doc-pill">📜 Multiple Certificates</span>
-                    <span class="size-pill">Multi-Upload Ready</span>
-                  </div>
-                </div>
-                <input type="file" id="resumeFileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.webp" style="display:none;">
-              </label>
-
-              <!-- Uploaded Multi-File Document List -->
-              <div id="uploadedFileInfo" class="uploaded-files-manager" style="display:none;">
-                <div class="files-manager-header">
-                  <span class="manager-title">📁 Uploaded Documents (<span id="uploadedFilesCount">0</span>)</span>
-                  <div style="display:flex; gap:8px;">
-                    <label for="resumeFileInput" class="btn-add-more-files" title="Add more certificate or resume files">
-                      + Add More Files
-                    </label>
-                    <button id="clearUploadBtn" class="clear-upload-action" type="button" title="Remove all files">
-                      Clear All
-                    </button>
-                  </div>
-                </div>
-                <div id="uploadedFilesList" class="uploaded-files-list"></div>
-                <div class="file-card-status" style="margin-top:8px;">
-                  <span class="status-success-dot"></span> Ready for Neural OCR &amp; Composite Twin Generation
-                </div>
-              </div>
-
-              <div class="format-chips-row">
-                <span class="format-chip">📄 Primary Resume</span>
-                <span class="format-chip">📜 Multiple Certificates</span>
-                <span class="format-chip">Tesseract Neural OCR</span>
-                <span class="format-chip">Composite Twin Boost</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Unified Calibration & Generation Bar -->
-        <div class="calibration-deck">
-          <div class="deck-header">
-            <div class="deck-title-wrap">
-              <span class="guide-step-tag">STEP 2</span>
-              <h3>Calibrate &amp; Materialize Digital Twin</h3>
-            </div>
-            <div class="deck-notice">
-              <span>🔒 In-memory processing • Never shared</span>
-            </div>
-          </div>
-
-          <div class="calibration-controls-grid">
-            <div class="calib-field">
-              <label for="githubInput">
-                <span class="field-icon">🐙</span>
-                GitHub Developer Username
-              </label>
-              <div class="input-with-affix">
-                <span class="affix">github.com/</span>
-                <input id="githubInput" type="text" placeholder="e.g. hardika-nimavat-dev" value="hardika-nimavat-dev">
-              </div>
-              <div class="calib-hint">Fetches public repositories, commit cadence, and maturity.</div>
-            </div>
-
-            <div class="calib-field">
-              <label for="roleInput">
-                <span class="field-icon">🎯</span>
-                Target Dream Role
-              </label>
+            <div class="gateway-field">
+              <label for="roleInput">Target Career Track</label>
               <div class="select-wrap">
                 <select id="roleInput">
                   <option value="frontend" selected>Frontend Developer</option>
@@ -256,18 +125,200 @@ e.g. Hardika Nimavat: B.Tech Computer Engineering student with foundational know
                   <option value="mobile">Mobile Developer</option>
                 </select>
               </div>
-              <div class="calib-hint">Calculates custom skill gaps &amp; 4-stage chained roadmap.</div>
             </div>
 
-            <div class="calib-action">
-              <button class="btn btn-generate-hero" id="generateBtn" type="button">
+            <div class="gateway-field">
+              <button class="btn btn-launch-twin" id="generateBtn" type="button" onclick="handleGenerate()">
                 <span class="btn-icon">⚡</span>
-                <span class="btn-text">Generate My Digital Twin</span>
+                <span class="btn-text">Verify &amp; Launch Digital Twin</span>
                 <span class="btn-arrow">&rarr;</span>
               </button>
             </div>
           </div>
+
+          <!-- Real-Time GitHub Verification Status Card -->
+          <div id="githubVerifyStatusWrap">
+            <div class="verification-card" id="verificationCard">
+              <div class="verification-profile-left">
+                <img id="verifyAvatarImg" src="https://avatars.githubusercontent.com/u/159757169?v=4" alt="GitHub Avatar" class="verified-avatar-img">
+                <div class="verified-meta">
+                  <div class="verified-name">
+                    <span id="verifyDisplayName">Hardika Nimavat</span>
+                    <span class="verified-handle" id="verifyDisplayHandle">@HardikaNimavat</span>
+                  </div>
+                  <div class="verified-bio" id="verifyDisplayBio">perfection and excellence</div>
+                </div>
+              </div>
+              <div class="verification-badges-right" id="verifyBadgesRight">
+                <span class="repo-pill" id="verifyRepoPill">📁 1 Public Repo</span>
+                <span class="status-chip-valid" id="verifyStatusChip">✓ Verified GitHub Account</span>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Optional Ingestion Drawer (Resume / Certificates) -->
+        <details class="optional-resume-drawer" id="optionalResumeDrawer">
+          <summary class="drawer-summary">
+            <div class="drawer-summary-left">
+              <span>📄</span>
+              <span>Optional: Enhance with Resume or Certificates (PDF, Images, Direct Text)</span>
+            </div>
+            <span class="drawer-tag">+ Expand Optional Upload</span>
+          </summary>
+          <div class="drawer-content">
+            <div class="intake-section-guide" style="margin-bottom:16px;">
+              <div class="guide-title-wrap">
+                <p style="color:var(--text-dim); font-size:13px; margin:0;">
+                  By default, your twin is generated directly from your verified GitHub repositories and programming activity. You can optionally paste or upload documents below to incorporate non-GitHub experience.
+                </p>
+              </div>
+              <div class="intake-mode-switcher-pills" id="inputModeTabs">
+                <button class="intake-pill-btn active input-tab" data-mode="text" id="pillSelectText" type="button">
+                  <span class="pill-icon">📝</span>
+                  <span class="pill-text">Direct Text</span>
+                </button>
+                <button class="intake-pill-btn input-tab" data-mode="upload" id="pillSelectUpload" type="button">
+                  <span class="pill-icon">📄</span>
+                  <span class="pill-text">Document OCR Upload</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Ingestion Cards Grid -->
+            <div class="intake-cards-grid">
+              <!-- CARD A: Direct Text & Markdown Synthesis -->
+              <div class="intake-card active" id="intakeTextCard">
+                <div class="intake-card-header">
+                  <div class="card-identity">
+                    <div class="card-icon-badge text-badge">📝</div>
+                    <div>
+                      <div class="pipeline-tag text-pipeline">Pipeline A</div>
+                      <h4>Direct Text &amp; Bio Synthesis</h4>
+                    </div>
+                  </div>
+                  <div class="mode-status-indicator active" id="textModeIndicator">
+                    <span class="status-dot"></span> Active Selection
+                  </div>
+                </div>
+
+                <p class="intake-card-desc">
+                  Paste or type your resume content, technical profile summary, or portfolio description.
+                </p>
+
+                <div class="intake-card-body">
+                  <div class="card-toolbar">
+                    <button class="sample-load-pill" id="sampleBtn" type="button">
+                      <span class="lightning">⚡</span> Load Sample Resume
+                    </button>
+                    <div class="char-count" id="textCharCount">0 characters</div>
+                  </div>
+
+                  <div class="textarea-wrap">
+                    <textarea id="resumeInput" placeholder="Optional: Paste additional resume details or experience here..."></textarea>
+                  </div>
+
+                  <div class="format-chips-row">
+                    <span class="format-chip">Plain Text</span>
+                    <span class="format-chip">Markdown</span>
+                    <span class="format-chip">Copied PDF</span>
+                    <span class="format-chip">Auto 50-Skill Taxonomy</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CARD B: Document & Multi-Certificate OCR Engine -->
+              <div class="intake-card" id="intakeUploadCard">
+                <div class="intake-card-header">
+                  <div class="card-identity">
+                    <div class="card-icon-badge upload-badge">📄</div>
+                    <div>
+                      <div class="pipeline-tag upload-pipeline">Pipeline B &bull; Multi-Doc</div>
+                      <h4>Resume &amp; Certificates Ingestion</h4>
+                    </div>
+                  </div>
+                  <div class="mode-status-indicator" id="uploadModeIndicator">
+                    <span class="status-dot"></span> Click to Select
+                  </div>
+                </div>
+
+                <p class="intake-card-desc">
+                  Upload your <b>Resume / CV</b> along with <b>Multiple Certificates &amp; Credentials</b> (PDF or Image). Dual PyPDF &amp; Neural OCR extracts extra skills.
+                </p>
+
+                <div class="intake-card-body">
+                  <label class="intake-dropzone-large" id="resumeDropZone" for="resumeFileInput">
+                    <div class="dropzone-inner">
+                      <div class="drop-icon-animated">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="17 8 12 3 7 8"/>
+                          <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                      </div>
+                      <div class="drop-title">Upload Resume &amp; Multiple Certificates</div>
+                      <div class="drop-subtitle">Drag &amp; drop all files here or <span class="browse-link">browse computer</span></div>
+                      <div class="supported-formats-pills">
+                        <span class="doc-pill">📄 Resume (.PDF/.PNG/.JPG)</span>
+                        <span class="doc-pill">📜 Multiple Certificates</span>
+                        <span class="size-pill">Multi-Upload Ready</span>
+                      </div>
+                    </div>
+                    <input type="file" id="resumeFileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.webp" style="display:none;">
+                  </label>
+
+                  <!-- Uploaded Multi-File Document List -->
+                  <div id="uploadedFileInfo" class="uploaded-files-manager" style="display:none;">
+                    <div class="files-manager-header">
+                      <span class="manager-title">📁 Uploaded Documents (<span id="uploadedFilesCount">0</span>)</span>
+                      <div style="display:flex; gap:8px;">
+                        <label for="resumeFileInput" class="btn-add-more-files" title="Add more certificate or resume files">
+                          + Add More Files
+                        </label>
+                        <button id="clearUploadBtn" class="clear-upload-action" type="button" title="Remove all files">
+                          Clear All
+                        </button>
+                      </div>
+                    </div>
+                    <div id="uploadedFilesList" class="uploaded-files-list"></div>
+                    <div class="file-card-status" style="margin-top:8px;">
+                      <span class="status-success-dot"></span> Ready for Neural OCR &amp; Composite Twin Generation
+                    </div>
+                    <button class="btn btn-launch-twin btn-launch-compact" id="generateBtnFileCard" type="button" style="margin-top:12px;" onclick="handleGenerate()">
+                      <span class="btn-icon">⚡</span>
+                      <span class="btn-text">Generate Twin with Uploaded Documents</span>
+                      <span class="btn-arrow">&rarr;</span>
+                    </button>
+                  </div>
+
+                  <div class="format-chips-row">
+                    <span class="format-chip">📄 Primary Resume</span>
+                    <span class="format-chip">📜 Multiple Certificates</span>
+                    <span class="format-chip">Tesseract Neural OCR</span>
+                    <span class="format-chip">Composite Twin Boost</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prominent Bottom Launch Bar: User never has to scroll upside again -->
+            <div class="intake-drawer-footer" id="intakeDrawerFooter">
+              <div class="drawer-footer-left">
+                <div class="footer-badge">⚡ Ready to Launch</div>
+                <div class="footer-text">
+                  <div class="footer-main-text">Generate your complete AI Career Twin</div>
+                  <div class="footer-sub-text">Integrates verified GitHub profile with uploaded resume &amp; technical certificates</div>
+                </div>
+              </div>
+              <button class="btn btn-launch-twin btn-launch-footer" id="generateBtnBottom" type="button" onclick="handleGenerate()">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">Generate &amp; Launch Digital Twin</span>
+                <span class="btn-arrow">&rarr;</span>
+              </button>
+            </div>
+
+          </div>
+        </details>
       </div>
 
       <!-- Loading Sequence -->
@@ -326,6 +377,37 @@ e.g. Hardika Nimavat: B.Tech Computer Engineering student with foundational know
               <span class="tg-pill">🎯 Target Post: <b id="greetingTargetRole">Frontend Developer</b></span>
               <span class="tg-pill">⚡ Readiness: <b id="greetingReadiness" style="color:var(--accent);">35%</b></span>
               <span class="tg-pill">⭐ Model: <b style="color:var(--accent);">Live &amp; Synced</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verified GitHub Developer Identity Strip -->
+        <div class="github-twin-strip" id="githubTwinStrip">
+          <div class="github-twin-card">
+            <div class="gt-left">
+              <img id="profileGhAvatar" src="https://avatars.githubusercontent.com/u/159757169?v=4" alt="GitHub Avatar" class="gt-avatar">
+              <div class="gt-info">
+                <div class="gt-name-row">
+                  <span class="gt-name" id="profileGhName">Hardika Nimavat</span>
+                  <a id="profileGhLink" href="https://github.com/HardikaNimavat" target="_blank" rel="noopener" class="gt-handle">@HardikaNimavat ↗</a>
+                  <span class="gt-verified-badge">✓ Verified GitHub Account</span>
+                </div>
+                <div class="gt-bio" id="profileGhBio">perfection and excellence</div>
+              </div>
+            </div>
+            <div class="gt-metrics">
+              <div class="gt-metric-item">
+                <span class="gt-metric-val mono" id="profileGhRepos">1</span>
+                <span class="gt-metric-lbl">Public Repos</span>
+              </div>
+              <div class="gt-metric-item">
+                <span class="gt-metric-val mono" id="profileGhScore">78.0</span>
+                <span class="gt-metric-lbl">Maturity Score</span>
+              </div>
+              <div class="gt-metric-item">
+                <span class="gt-metric-val mono" id="profileGhCommits">185+</span>
+                <span class="gt-metric-lbl">Annual Commits</span>
+              </div>
             </div>
           </div>
         </div>
@@ -864,10 +946,10 @@ e.g. Hardika Nimavat: B.Tech Computer Engineering student with foundational know
     Twin &mdash; AI Career Digital Twin &middot; Software Group Project (Indus University, Ahmedabad &middot; 2025&ndash;2026).
   </footer>
 
-  <script src="/js/api.js?v=4.1"></script>
-  <script src="/js/constellation.js?v=4.1"></script>
-  <script src="/js/interview.js?v=4.1"></script>
-  <script src="/js/cert_verifier.js?v=4.1"></script>
-  <script src="/js/app.js?v=4.1"></script>
+  <script src="/js/api.js?v=4.5"></script>
+  <script src="/js/constellation.js?v=4.5"></script>
+  <script src="/js/interview.js?v=4.5"></script>
+  <script src="/js/cert_verifier.js?v=4.5"></script>
+  <script src="/js/app.js?v=4.5"></script>
 </body>
 </html>

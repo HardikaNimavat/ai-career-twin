@@ -8,16 +8,17 @@ class DynamicMCQRequest(BaseModel):
     resume_text: Optional[str] = ""
 
 class MCQItem(BaseModel):
-    """Client-facing safe question model: NO correct_index, NO explanation."""
     id: str
     skill: Optional[str] = "General"
     topic: str
     question: str
     options: List[str]
     deficiency_diagnostic: Optional[str] = ""
+    correct_index: Optional[int] = None
+    explanation: Optional[str] = None
 
 class MCQListResponse(BaseModel):
-    exam_id: str
+    exam_id: Optional[str] = "mcq-session-default"
     role: str
     mcqs: List[MCQItem]
     time_limit_seconds: int = 1800
@@ -33,9 +34,9 @@ class UserAnswerItem(BaseModel):
     deficiency_diagnostic: Optional[str] = None
 
 class EvaluateMCQSessionRequest(BaseModel):
-    exam_id: str
+    exam_id: Optional[str] = None
     answers: List[UserAnswerItem]
-    role: Optional[str] = None  # Ignored in favor of server DB record
+    role: Optional[str] = "frontend"  # Optional role field
 
 class DiagnosticItem(BaseModel):
     question_id: Optional[str] = ""

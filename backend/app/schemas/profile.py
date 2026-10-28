@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
 
 class ResumeParseRequest(BaseModel):
-    resume_text: str = Field(..., description="Plain text or parsed resume contents")
+    resume_text: Optional[str] = Field("", description="Plain text or parsed resume contents")
     github_username: Optional[str] = Field(None, description="GitHub profile handle")
     target_role: str = Field("frontend", description="Selected target dream role")
 
@@ -20,6 +20,10 @@ class GitHubAnalysisResult(BaseModel):
     top_languages: List[str]
     language_weights: List[int]
     diagnostic_notes: List[str]
+    avatar_url: Optional[str] = None
+    name: Optional[str] = None
+    bio: Optional[str] = None
+    html_url: Optional[str] = None
 
 class DigitalTwinResponse(BaseModel):
     profile: DetectedProfile

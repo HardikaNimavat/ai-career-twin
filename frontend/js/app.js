@@ -75,6 +75,66 @@ let examState = {
   score: 0
 };
 
+// ─── GitHub Account Verification State ───
+let lastVerifiedGitHubUser = null;
+let verifyDebounceTimer = null;
+
+function renderVerifyStatus(status) {
+  const card = document.getElementById('verificationCard');
+  const avatarImg = document.getElementById('verifyAvatarImg');
+  const nameEl = document.getElementById('verifyDisplayName');
+  const handleEl = document.getElementById('verifyDisplayHandle');
+  const bioEl = document.getElementById('verifyDisplayBio');
+  const badgesRight = document.getElementById('verifyBadgesRight');
+
+  if (!card || !badgesRight) return;
+
+  if (status.checking) {
+    card.className = "verification-card checking";
+    badgesRight.innerHTML = `
+      <span class="status-chip-checking">
+        <span class="pulsing-dot"></span> Checking GitHub Account...
+      </span>
+    `;
+    return;
+  }
+
+  if (status.valid) {
+    card.className = "verification-card";
+    if (avatarImg) avatarImg.src = status.avatar_url || `https://github.com/${status.username}.png`;
+    if (nameEl) nameEl.textContent = status.name || status.username;
+    if (handleEl) handleEl.textContent = `@${status.username}`;
+    if (bioEl) bioEl.textContent = status.bio || "Active Public GitHub Developer";
+    badgesRight.innerHTML = `
+      <span class="repo-pill">📁 ${status.public_repos || 1} Public Repo${status.public_repos === 1 ? '' : 's'}</span>
+      <span class="status-chip-valid">✓ Verified GitHub Account</span>
+    `;
+    lastVerifiedGitHubUser = status;
+  } else {
+    card.className = "verification-card invalid";
+    if (avatarImg) avatarImg.src = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png";
+    if (nameEl) nameEl.textContent = "Account Not Found";
+    const currentInput = document.getElementById('githubInput') ? document.getElementById('githubInput').value.trim() : "";
+    if (handleEl) handleEl.textContent = currentInput ? `@${currentInput}` : "";
+    if (bioEl) bioEl.textContent = "No matching public GitHub user exists with this username.";
+    badgesRight.innerHTML = `
+      <span class="status-chip-invalid">✕ ${status.error || "GitHub User Not Found"}</span>
+    `;
+    lastVerifiedGitHubUser = null;
+  }
+}
+
+async function triggerGitHubCheck(username) {
+  const clean = (username || "").trim().replace(/^@/, "");
+  if (!clean) {
+    renderVerifyStatus({ valid: false, error: "Please enter a GitHub username." });
+    return;
+  }
+  renderVerifyStatus({ checking: true });
+  const result = await API.verifyGitHubUser(clean);
+  renderVerifyStatus(result);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const generateBtn = document.getElementById('generateBtn');
   const sampleBtn = document.getElementById('sampleBtn');
@@ -83,6 +143,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const recalcTrajBtn = document.getElementById('recalcTrajBtn');
   const topRoleSelector = document.getElementById('topRoleSelector');
   const profileRoleSwitchSelect = document.getElementById('profileRoleSwitchSelect');
+  const githubInput = document.getElementById('githubInput');
+  const btnCheckGithub = document.getElementById('btnCheckGithub');
+
+  // Real-Time GitHub Verification Listeners
+  if (githubInput) {
+    githubInput.addEventListener('input', () => {
+      clearTimeout(verifyDebounceTimer);
+      verifyDebounceTimer = setTimeout(() => {
+        triggerGitHubCheck(githubInput.value);
+      }, 400);
+    });
+
+    githubInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleGenerate();
+      }
+    });
+  }
+
+  if (btnCheckGithub) {
+    btnCheckGithub.addEventListener('click', () => {
+      if (githubInput) triggerGitHubCheck(githubInput.value);
+    });
+  }
+
+  // Pre-verify default GitHub username immediately on startup
+  if (githubInput && githubInput.value) {
+    triggerGitHubCheck(githubInput.value);
+  }
 
   function updateResumeCharCount() {
     const resInput = document.getElementById('resumeInput');
@@ -96,11 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sampleBtn) {
     sampleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      // Switch to text mode first
       switchInputMode('text');
       const resInput = document.getElementById('resumeInput');
       if (resInput) resInput.value = SAMPLE_RESUME;
-      document.getElementById('githubInput').value = "hardika-nimavat-dev";
+      if (githubInput) {
+        githubInput.value = "HardikaNimavat";
+        triggerGitHubCheck("HardikaNimavat");
+      }
       document.getElementById('roleInput').value = "frontend";
       updateResumeCharCount();
     });
@@ -140,9 +232,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (generateBtn) {
-    generateBtn.addEventListener('click', handleGenerate);
-  }
+  const generateBtnBottom = document.getElementById('generateBtnBottom');
+  const generateBtnFileCard = document.getElementById('generateBtnFileCard');
+
+  [generateBtn, generateBtnBottom, generateBtnFileCard].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', handleGenerate);
+    }
+  });
 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', handleLogout);
@@ -391,16 +488,24 @@ function setupCityPills() {
 }
 
 function handleLogout() {
-  if (confirm("Are you sure you want to log out and reset your Career Twin session?")) {
+  if (confirm("Would you like to switch your GitHub account or reset your Twin session?")) {
     window.STATE = {};
+    API.clearToken();
+    lastVerifiedGitHubUser = null;
     const resumeInput = document.getElementById('resumeInput');
     if (resumeInput) resumeInput.value = "";
-    document.getElementById('githubInput').value = "";
+    const ghInput = document.getElementById('githubInput');
+    if (ghInput) {
+      ghInput.value = "HardikaNimavat";
+      triggerGitHubCheck("HardikaNimavat");
+    }
     
-    // Hide App, Topnav & Top Role Switcher
+    // Hide App, Topnav & Top Role Switcher & User Pill
     document.getElementById('app').style.display = 'none';
     document.getElementById('topnav').classList.remove('show');
     document.getElementById('logoutBtn').classList.remove('show');
+    const userTwinPill = document.getElementById('userTwinPill');
+    if (userTwinPill) userTwinPill.style.display = 'none';
     const topSwitcher = document.getElementById('topRoleSwitchWrap');
     if (topSwitcher) topSwitcher.style.display = 'none';
     
@@ -456,60 +561,113 @@ function runFastLoadingSequence() {
 }
 
 async function handleGenerate() {
+  console.log("[Digital Twin] handleGenerate initiated");
   const inputMode = window.STATE.inputMode || 'text';
-  const githubName = document.getElementById('githubInput').value.trim();
-  const roleKey = document.getElementById('roleInput').value;
+  const ghInput = document.getElementById('githubInput');
+  const rawGh = (ghInput ? ghInput.value : "").trim().replace(/^@/, "");
+  const roleKey = document.getElementById('roleInput') ? document.getElementById('roleInput').value : "frontend";
 
-  // Validate input based on mode
-  if (inputMode === 'text') {
-    const resumeText = document.getElementById('resumeInput').value.trim();
-    if (!resumeText) {
-      alert("Please paste your resume or technical profile text first.");
-      return;
-    }
-  } else {
-    const filesToUpload = window.STATE.uploadedFiles && window.STATE.uploadedFiles.length > 0
-      ? window.STATE.uploadedFiles
-      : (window.STATE.uploadedFile ? [window.STATE.uploadedFile] : []);
-    if (filesToUpload.length === 0) {
-      alert("Please upload your resume and/or certificate file(s) first.");
-      return;
+  if (!rawGh) {
+    alert("Please enter your GitHub account username.");
+    if (ghInput) ghInput.focus();
+    return;
+  }
+
+  // Visual feedback: show compiling state on all launch buttons
+  const launchBtns = document.querySelectorAll('.btn-launch-twin');
+  launchBtns.forEach(b => {
+    b.disabled = true;
+    const txt = b.querySelector('.btn-text');
+    if (txt) txt.textContent = "Compiling Digital Twin...";
+  });
+
+  // 1. Verify GitHub account first
+  if (!lastVerifiedGitHubUser || lastVerifiedGitHubUser.username.toLowerCase() !== rawGh.toLowerCase()) {
+    renderVerifyStatus({ checking: true });
+    try {
+      const check = await API.verifyGitHubUser(rawGh);
+      if (check && check.valid) {
+        renderVerifyStatus(check);
+      } else {
+        renderVerifyStatus(check || { valid: false, error: `GitHub user '${rawGh}' not found.` });
+        alert(check && check.error ? check.error : `GitHub account '${rawGh}' does not exist on GitHub. Please check your username.`);
+        launchBtns.forEach(b => {
+          b.disabled = false;
+          const txt = b.querySelector('.btn-text');
+          if (txt) txt.textContent = "Generate & Launch Digital Twin";
+        });
+        if (ghInput) ghInput.focus();
+        return;
+      }
+    } catch (verErr) {
+      console.warn("GitHub verification check skipped due to network:", verErr);
     }
   }
 
-  const heroIntake = document.getElementById('heroIntakeSection') || document.getElementById('landing').querySelector('.hero-grid');
-  if (heroIntake) heroIntake.style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
+  const githubName = (lastVerifiedGitHubUser && lastVerifiedGitHubUser.username) ? lastVerifiedGitHubUser.username : rawGh;
 
-  // 1. Start fast visual animation in parallel
+  // 2. Establish authenticated session with GitHub handle (no passwords/signup)
+  try {
+    await API.createGitHubSession(githubName);
+  } catch (err) {
+    console.warn("Session warning:", err);
+  }
+
+  // 3. Hide landing elements and reveal loading sequence at the top
+  const heroEl = document.querySelector('.hero');
+  const gatewayEl = document.querySelector('.github-gateway-card');
+  const drawerEl = document.getElementById('optionalResumeDrawer');
+  if (heroEl) heroEl.style.display = 'none';
+  if (gatewayEl) gatewayEl.style.display = 'none';
+  if (drawerEl) drawerEl.style.display = 'none';
+
+  const loadingEl = document.getElementById('loading');
+  if (loadingEl) {
+    loadingEl.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Start fast visual animation in parallel
   const stopAnimation = runFastLoadingSequence();
 
-  // 2. Fire backend API request
+  // Fire backend API request
   try {
     let data;
-    if (inputMode === 'upload') {
-      const filesToUpload = window.STATE.uploadedFiles && window.STATE.uploadedFiles.length > 0
-        ? window.STATE.uploadedFiles
-        : [window.STATE.uploadedFile];
-      data = await API.uploadResume(filesToUpload, githubName, roleKey);
+    const filesToUpload = window.STATE.uploadedFiles && window.STATE.uploadedFiles.length > 0
+      ? window.STATE.uploadedFiles
+      : (window.STATE.uploadedFile ? [window.STATE.uploadedFile] : []);
+
+    const resumeText = document.getElementById('resumeInput') ? document.getElementById('resumeInput').value.trim() : "";
+
+    if (filesToUpload.length > 0) {
+      data = await API.uploadResume(filesToUpload, githubName, roleKey, resumeText);
     } else {
-      // Text mode
-      const resumeText = document.getElementById('resumeInput').value.trim();
+      // Text mode or purely GitHub-based (resume is completely optional!)
       data = await API.parseAndGenerateTwin(resumeText, githubName, roleKey);
     }
 
     stopAnimation();
 
+    const candidateDisplayName = (lastVerifiedGitHubUser && lastVerifiedGitHubUser.name) ||
+      (data.github && data.github.name) ||
+      (data.profile && data.profile.candidate_name) ||
+      githubName;
+
     window.STATE = {
       ...window.STATE,
       parsed: {
-        candidate_name: (data.profile && data.profile.candidate_name) || "Hardika",
+        candidate_name: candidateDisplayName,
         detected: data.profile.detected_skills,
         expYears: data.profile.experience_years,
         dominant_cluster: data.profile.dominant_cluster,
         skills_count: data.profile.skills_count
       },
-      github: data.github,
+      github: {
+        ...data.github,
+        name: candidateDisplayName,
+        avatar_url: (data.github && data.github.avatar_url) || (lastVerifiedGitHubUser && lastVerifiedGitHubUser.avatar_url) || `https://github.com/${githubName}.png`,
+        bio: (data.github && data.github.bio) || (lastVerifiedGitHubUser && lastVerifiedGitHubUser.bio) || "Active Public GitHub Developer"
+      },
       roleKey: roleKey,
       selectedCity: "Ahmedabad",
       gapAnalysis: {
@@ -533,6 +691,14 @@ async function handleGenerate() {
       document.getElementById('profileRoleSwitchSelect').value = roleKey;
     }
 
+    // Update Topbar User Pill
+    const userTwinPill = document.getElementById('userTwinPill');
+    const topbarAvatar = document.getElementById('topbarAvatar');
+    const topbarUsername = document.getElementById('topbarUsername');
+    if (userTwinPill) userTwinPill.style.display = 'flex';
+    if (topbarAvatar) topbarAvatar.src = window.STATE.github.avatar_url;
+    if (topbarUsername) topbarUsername.textContent = `@${githubName}`;
+
     renderProfile();
     renderGaps();
     if (typeof renderTrajectory === 'function') renderTrajectory();
@@ -553,11 +719,28 @@ async function handleGenerate() {
     stopAnimation();
     console.error("Twin generation error:", err);
     alert(err.message || "An error occurred while generating your Digital Twin. Please try again.");
-    document.getElementById('loading').style.display = 'none';
-    const heroIntake = document.getElementById('heroIntakeSection') || document.getElementById('landing').querySelector('.hero-grid');
-    if (heroIntake) heroIntake.style.display = 'block';
+
+    // Restore UI visibility on error
+    const heroEl = document.querySelector('.hero');
+    const gatewayEl = document.querySelector('.github-gateway-card');
+    const drawerEl = document.getElementById('optionalResumeDrawer');
+    if (heroEl) heroEl.style.display = '';
+    if (gatewayEl) gatewayEl.style.display = '';
+    if (drawerEl) drawerEl.style.display = '';
+
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    launchBtns.forEach(b => {
+      b.disabled = false;
+      const txt = b.querySelector('.btn-text');
+      if (txt) txt.textContent = "Generate & Launch Digital Twin";
+    });
   }
 }
+
+// Make handleGenerate accessible globally for inline onclick handlers
+window.handleGenerate = handleGenerate;
 
 /**
  * Instant in-dashboard role switching:
@@ -625,7 +808,7 @@ function renderProfile() {
   const gapRows = window.STATE.gapAnalysis ? window.STATE.gapAnalysis.rows : [];
 
   // 0. Update Conversational Chatbot Greeting Upside Digital Twin
-  const candidateName = candidate_name || "Hardika";
+  const candidateName = candidate_name || (window.STATE.github && window.STATE.github.name) || "Hardika";
   const greetingUser = document.getElementById('greetingUserText');
   if (greetingUser) greetingUser.textContent = `Hey ${candidateName}! 👋`;
   const greetingTarget = document.getElementById('greetingTargetRole');
@@ -634,6 +817,34 @@ function renderProfile() {
   if (greetingReady) {
     greetingReady.textContent = `${readiness}%`;
     greetingReady.style.color = readiness >= 70 ? "var(--accent)" : readiness >= 40 ? "var(--amber)" : "var(--coral)";
+  }
+
+  // Populate Verified GitHub Identity Strip
+  if (window.STATE.github) {
+    const gh = window.STATE.github;
+    const ghAvatar = document.getElementById('profileGhAvatar');
+    if (ghAvatar) ghAvatar.src = gh.avatar_url || (lastVerifiedGitHubUser && lastVerifiedGitHubUser.avatar_url) || `https://github.com/${gh.username}.png`;
+
+    const ghName = document.getElementById('profileGhName');
+    if (ghName) ghName.textContent = gh.name || candidateName || gh.username;
+
+    const ghLink = document.getElementById('profileGhLink');
+    if (ghLink) {
+      ghLink.textContent = `@${gh.username} ↗`;
+      ghLink.href = gh.html_url || `https://github.com/${gh.username}`;
+    }
+
+    const ghBio = document.getElementById('profileGhBio');
+    if (ghBio) ghBio.textContent = gh.bio || (lastVerifiedGitHubUser && lastVerifiedGitHubUser.bio) || "Active Public GitHub Developer";
+
+    const ghRepos = document.getElementById('profileGhRepos');
+    if (ghRepos) ghRepos.textContent = gh.public_repos || 1;
+
+    const ghScore = document.getElementById('profileGhScore');
+    if (ghScore) ghScore.textContent = (gh.quality_score || 75.0).toFixed(1);
+
+    const ghCommits = document.getElementById('profileGhCommits');
+    if (ghCommits) ghCommits.textContent = `${gh.contributions_per_year || 160}+`;
   }
 
   const skillCountEl = document.getElementById('skillCount');

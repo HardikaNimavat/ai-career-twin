@@ -31,14 +31,27 @@ def parse_and_generate_twin(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not payload.resume_text.strip():
-        raise HTTPException(status_code=400, detail="Resume text cannot be empty.")
-
     target_role = payload.target_role.lower().strip()
     if target_role not in SUPPORTED_ROLES:
         raise HTTPException(
             status_code=400,
             detail=f"Unsupported role '{payload.target_role}'. Supported roles are: {', '.join(SUPPORTED_ROLES)}"
+        )
+
+    gh_handle = (payload.github_username or (current_user and current_user.username) or "HardikaNimavat").strip().lstrip("@")
+
+    # If resume text is not supplied, auto-synthesize from GitHub profile and repository activity
+    if not payload.resume_text or not payload.resume_text.strip():
+        gh_quick = github_analyzer.analyze_profile(gh_handle, {})
+        top_langs = gh_quick.get("top_languages", ["JavaScript", "HTML", "CSS", "Python"])
+        notes = " ".join(gh_quick.get("diagnostic_notes", []))
+        payload.resume_text = (
+            f"Developer Profile: {gh_handle}\n"
+            f"Target Career Track: {target_role.capitalize()}\n"
+            f"Public Repositories: {gh_quick.get('public_repos', 1)}\n"
+            f"Primary Technical Languages: {', '.join(top_langs)}\n"
+            f"Engineering Activity: {notes}\n"
+            f"Demonstrated Competencies: {', '.join(top_langs)}, Git, GitHub, REST APIs, System Design, Problem Solving."
         )
 
     # 1. Skill Extraction

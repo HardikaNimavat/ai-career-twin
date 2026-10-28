@@ -25,21 +25,23 @@ def generate_dynamic_mcqs(payload: DynamicMCQRequest):
     Dynamically generates fresh MCQs tailored to the candidate's resume skills
     and target role. Shuffles choices and orders on every call.
     """
+    import uuid
     mcqs = interview_service.generate_dynamic_mcqs(
         role=payload.role,
         detected_skills=payload.detected_skills,
         count=payload.count,
         resume_text=payload.resume_text or ""
     )
-    return {"role": payload.role, "mcqs": mcqs}
+    return {"role": payload.role, "mcqs": mcqs, "exam_id": str(uuid.uuid4())}
 
 @router.get("/mcqs/{role}", response_model=MCQListResponse)
 def get_mcqs(role: str):
     """
     Returns default MCQs for a given role with randomized option choices.
     """
+    import uuid
     mcqs = interview_service.generate_dynamic_mcqs(role=role, detected_skills={}, count=5)
-    return {"role": role, "mcqs": mcqs}
+    return {"role": role, "mcqs": mcqs, "exam_id": str(uuid.uuid4())}
 
 @router.post("/evaluate-mcq-session", response_model=EvaluateMCQSessionResponse)
 def evaluate_mcq_session(payload: EvaluateMCQSessionRequest, db: Session = Depends(get_db)):

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from backend.app.core.database import get_db
 from backend.app.core.security import get_password_hash, verify_password, create_access_token
 from backend.app.models.user import User
+from pydantic import BaseModel
 from backend.app.schemas.auth import UserRegisterRequest, UserLoginRequest, TokenResponse, UserResponse
 from backend.app.api.deps import get_current_user
 
@@ -104,7 +105,77 @@ def login_user(payload: UserLoginRequest, response: Response, db: Session = Depe
 def get_me(current_user: User = Depends(get_current_user)):
     return UserResponse.model_validate(current_user)
 
+class GitHubSessionPayload(BaseModel):
+    github_username: str
+
+@router.post("/github-session", response_model=TokenResponse)
+def github_session_login(
+    payload: GitHubSessionPayload,
+    response: Response,
+    db: Session = Depends(get_db)
+):
+    """
+    Direct GitHub account entry:
+    Verifies that the GitHub user is valid, then establishes an authenticated session
+    without requiring any traditional email/password registration or login.
+    """
+    from backend.app.services.github_analyzer import github_analyzer
+    
+    clean_handle = payload.github_username.strip().lstrip("@")
+    if not clean_handle:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="GitHub username cannot be empty."
+        )
+
+    # Verify that the GitHub user exists
+    verify_res = github_analyzer.verify_user(clean_handle)
+    if not verify_res.get("valid"):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=verify_res.get("error", f"GitHub user '{clean_handle}' does not exist.")
+        )
+
+    canonical_username = verify_res.get("username", clean_handle)
+    email_for_user = f"{canonical_username.lower()}@github.career-twin.local"
+
+    # Find existing user or create a new user profile
+    user = db.query(User).filter(
+        (User.username == canonical_username) | (User.email == email_for_user)
+    ).first()
+
+    if not user:
+        user = User(
+            public_id=str(uuid.uuid4()),
+            email=email_for_user,
+            username=canonical_username,
+            hashed_password=get_password_hash("github_sso_nopassword_session"),
+            is_active=True
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    token = create_access_token({"sub": str(user.id)}, expires_delta=timedelta(days=7))
+
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        max_age=86400 * 7
+    )
+
+    logger.info("GitHub session established for user #%s (@%s)", user.id, canonical_username)
+    return TokenResponse(
+        access_token=token,
+        token_type="bearer",
+        user=UserResponse.model_validate(user)
+    )
+
 @router.post("/logout")
 def logout_user(response: Response):
     response.delete_cookie(key="access_token")
     return {"message": "Successfully logged out."}
+

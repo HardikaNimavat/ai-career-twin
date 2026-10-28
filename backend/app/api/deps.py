@@ -18,41 +18,46 @@ def get_current_user(
         token = token_auth.credentials
     elif "access_token" in request.cookies:
         token = request.cookies.get("access_token")
-    
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required. Please log in.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    try:
-        payload = decode_access_token(token)
-        user_id = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token payload.",
-                headers={"WWW-Authenticate": "Bearer"},
+
+    if token:
+        try:
+            payload = decode_access_token(token)
+            user_id = payload.get("sub")
+            if user_id:
+                user = db.query(User).filter(User.id == int(user_id)).first()
+                if user and user.is_active:
+                    return user
+        except Exception:
+            pass
+
+    # Check for X-GitHub-Username header for zero-friction identity
+    gh_header = request.headers.get("X-GitHub-Username") or request.headers.get("x-github-username")
+    if gh_header:
+        gh_handle = gh_header.strip().lstrip("@")
+        email_for_user = f"{gh_handle.lower()}@github.career-twin.local"
+
+        user = db.query(User).filter(
+            (User.username == gh_handle) | (User.email == email_for_user)
+        ).first()
+
+        if not user:
+            from backend.app.core.security import get_password_hash
+            import uuid
+            user = User(
+                public_id=str(uuid.uuid4()),
+                email=email_for_user,
+                username=gh_handle,
+                hashed_password=get_password_hash("github_auto_identity"),
+                is_active=True
             )
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials or token expired.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    user = db.query(User).filter(User.id == int(user_id)).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account is inactive.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+        return user
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required. Please connect with your GitHub account.",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
